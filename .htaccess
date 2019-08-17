@@ -1,21 +1,39 @@
+# http://glennmessersmith.com/pages/wphtaccess.html https://httpd.apache.org/docs/2.4/rewrite/flags.html https://mediatemple.net/community/products/dv/204643270/using-htaccess-rewrite-rules
+# If mod_rewrite.c module is installed
 <IfModule mod_rewrite.c>
+# If mod_negotiation.c module is installed
     <IfModule mod_negotiation.c>
+# The Options controls which server features are available in a particular directory.
+# Minus (-) removes, (+) adds feature
+# Multiviews - If the server receives a request for /some/dir/foo and /some/dir/foo does not exist, then the server reads the directory looking for all files named foo.*, and effectively fakes up a type map which names all those files, assigning them the same media types and content-encodings it would have if the client had asked for one of them by name. It then chooses the best match to the client's requirements, and returns that document.
+# Indexes - To prevent directory listings (for security purposes, for example), you should remove the Indexes 
         Options -MultiViews -Indexes
     </IfModule>
 
+# RewriteEngine On enables mod_rewrite. You could set the engine to Off to not process any rules. During testing, this is much easier than commenting out every rule.
     RewriteEngine On
 
-    # Handle Authorization Header
+# Handle Authorization Header
+# RewriteCond means a condition must be true in order for the next RewriteRule to be processed
     RewriteCond %{HTTP:Authorization} .
+# RewriteRule defines a particular rule.
+# Setting HTTP_AUTHORIZATION as an environment variable
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+# Redirect Trailing Slashes If Not A Folder, website.co.uk/cheese/ redirects to /cheese
+# %{REQUEST_FILENAME} is a variable set by the server to contain the request URL, checking for valid directories (the -d flag), !-d means REQUEST_FILENAME should not be a valid directory
     RewriteCond %{REQUEST_FILENAME} !-d
+# REQUEST_URI is the path component of the requested URI, such as /post/%{REQUEST_URI}.php
+# (.+)/$ to remove trailing slash by using regex capture group
     RewriteCond %{REQUEST_URI} (.+)/$
+# First argument of RewriteRule defines what the original URL looks like
+# %1 Refers to first pattern matched in a RewriteCond condition, while $1 refers to first pattern matched inside a RewriteRule.
+# The [L] flag once again means do not process any other rules after this one
+# [R] flag causes a HTTP redirect, HTTP response status code is specified after "="
     RewriteRule ^ %1 [L,R=301]
 
-    # Handle Front Controller...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
+# Any public/(x) request is left alone
+    RewriteRule ^(public/)(.)+$ - [L]
+# All other requests are sent to index.php
     RewriteRule ^ index.php [L]
 </IfModule>
