@@ -4,8 +4,13 @@ namespace App\Controllers;
 
 class HomeController extends Controller
 {
-	function __construct()
+	public function index()
 	{
-		echo "Home Constructor Instantiated. <br>";
+		echo "Index. <br>";
+	}
+
+	public function blah()
+	{
+		echo "blah. <br>";
 	}
 }
