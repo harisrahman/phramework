@@ -26,6 +26,12 @@ class Router
 		return $arr;
 	}
 
+	function preg_array_key_exists(string $pattern, array $arr) : bool
+	{
+		$keys = array_keys($array);    
+		return preg_match($pattern, $keys);
+	}
+
 	private function is_method_defined()
 	{
 		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
