@@ -26,12 +26,6 @@ class Router
 		return $arr;
 	}
 
-	function preg_array_key_exists(string $pattern, array $arr) : bool
-	{
-		$keys = array_keys($array);    
-		return preg_match($pattern, $keys);
-	}
-
 	private function is_method_defined()
 	{
 		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
@@ -61,9 +55,16 @@ class Router
 
 	public function run()
 	{
-		if (array_key_exists($this->uri, $this->routes) && $this->is_method_defined())
+		$route_result = preg_array_key_match($this->uri, $this->routes);
+
+		if ($route_result)
 		{
-			$this->set_controller_and_action();
+			$this->uri = $route_result;
+
+			if ($this->is_method_defined())
+			{
+				$this->set_controller_and_action();
+			}
 		}
 		else
 		{

@@ -12,6 +12,7 @@ class Helpers
 
 		return $this;
 	}
+
 }
 
 function request()
@@ -22,4 +23,16 @@ function request()
 function router($routes, $uri)
 {
 	return new Core\Routing\Router($routes, $uri);
+}
+
+function preg_array_key_match(string $needle, array $haystack)
+{
+	foreach ($haystack as $key => $value)
+	{
+		$pattern = "/^" . str_replace('/', '\/', $key) . "$/";
+		
+		if (preg_match($pattern, $needle))
+			return $key;
+	}
+	return false;
 }

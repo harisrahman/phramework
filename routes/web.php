@@ -2,8 +2,6 @@
 
 $routes = [
 
-	// "/" => "index@HomeController",
-
 	"/" => [
 
 		"get" => "index@HomeController",
@@ -12,5 +10,7 @@ $routes = [
 	],
 
 	"/blah" => "blah@HomeController",
+
+	"blogs/blog/\d+" => "index@HomeController",
 
 ];
