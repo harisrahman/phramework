@@ -26,6 +26,20 @@ class Router
 		return $arr;
 	}
 
+	private function route_match(string $needle, array $haystack)
+	{
+		foreach ($haystack as $key => $value)
+		{
+			if (strpos($key, "{") === false || strpos($key, "}") === false) continue;
+
+			$pattern = "/^" . str_replace(['/', '{', '}'], ['\/', '', ''], $key) . "$/";
+
+			if (preg_match($pattern, $needle))
+				return $key;
+		}
+		return false;
+	}
+
 	private function is_method_defined()
 	{
 		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
@@ -64,7 +78,7 @@ class Router
 			}
 		}
 //Then match if regex route exists
-		elseif ($this->uri = preg_array_key_match($this->uri, $this->routes))
+		elseif ($this->uri = $this->route_match($this->uri, $this->routes))
 		{
 			if ($this->is_method_defined())
 			{

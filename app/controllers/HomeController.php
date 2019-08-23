@@ -6,7 +6,7 @@ class HomeController extends Controller
 {
 	public function index()
 	{
-		echo "Index. <br>";
+		return view("homepage", ["name" => "Haris"]);
 	}
 
 	public function blah()

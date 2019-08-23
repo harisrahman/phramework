@@ -15,18 +15,6 @@ class Helpers
 
 }
 
-function preg_array_key_match(string $needle, array $haystack)
-{
-	foreach ($haystack as $key => $value)
-	{
-		$pattern = "/^" . str_replace('/', '\/', $key) . "$/";
-		
-		if (preg_match($pattern, $needle))
-			return $key;
-	}
-	return false;
-}
-
 function request()
 {
 	return (new Helpers)->request();	
@@ -39,5 +27,16 @@ function router($routes, $uri)
 
 function view(string $view_name, array $data = [])
 {
-	exit($view_name);
+	$view_file = getcwd() . "/app/views/" . $view_name . ".php";
+
+	if (file_exists($view_file))
+	{
+		if (!empty($data)) extract($data);
+
+		require $view_file;
+	}
+	else
+	{
+		exit('View "' . $view_name . '" not found.');
+	}
 }
