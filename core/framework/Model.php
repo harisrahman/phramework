@@ -1,10 +1,8 @@
 <?php
 
-use Core\Framework\BaseModel as BaseModel;
-
 namespace App\Models;
 
-class Model extends BaseModel
+class Model
 {
 	function __construct()
 	{

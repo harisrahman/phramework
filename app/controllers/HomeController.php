@@ -11,6 +11,11 @@ class HomeController extends Controller
 
 	public function blah()
 	{
-		echo "blah. <br>";
+		echo "normal route. <br>";
+	}
+
+	public function regex_route()
+	{
+		echo "regex route. <br>";
 	}
 }

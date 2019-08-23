@@ -15,16 +15,6 @@ class Helpers
 
 }
 
-function request()
-{
-	return (new Helpers)->request();	
-}
-
-function router($routes, $uri)
-{
-	return new Core\Routing\Router($routes, $uri);
-}
-
 function preg_array_key_match(string $needle, array $haystack)
 {
 	foreach ($haystack as $key => $value)
@@ -35,4 +25,19 @@ function preg_array_key_match(string $needle, array $haystack)
 			return $key;
 	}
 	return false;
+}
+
+function request()
+{
+	return (new Helpers)->request();	
+}
+
+function router($routes, $uri)
+{
+	return new Core\Routing\Router($routes, $uri);
+}
+
+function view(string $view_name, array $data = [])
+{
+	exit($view_name);
 }

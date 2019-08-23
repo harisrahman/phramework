@@ -48,27 +48,30 @@ class Router
 	{
 		$route_string_arr = explode("@", $this->route_string);
 
-		$controller = "App\Controllers\\" . $route_string_arr[1];
+		$controller = "\App\Controllers\\" . $route_string_arr[1];
 		$this->controller = new $controller;
 		$this->action = $this->controller->{$route_string_arr[0]}();
 	}
 
 	public function run()
 	{
-		$route_result = preg_array_key_match($this->uri, $this->routes);
-
-		if ($route_result)
+//First check if exact route exists
+		if (array_key_exists($this->uri, $this->routes))
 		{
-			$this->uri = $route_result;
-
 			if ($this->is_method_defined())
 			{
-				$this->set_controller_and_action();
+				return $this->set_controller_and_action();
 			}
 		}
-		else
+//Then match if regex route exists
+		elseif ($this->uri = preg_array_key_match($this->uri, $this->routes))
 		{
-			echo "404";
+			if ($this->is_method_defined())
+			{
+				return $this->set_controller_and_action();
+			}
 		}
+//Return 404
+		return (new \Core\Framework\Controller)->not_found();
 	}
 }
