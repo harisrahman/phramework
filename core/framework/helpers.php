@@ -6,10 +6,12 @@ class Helpers
 
 	public function request()
 	{
-		$parser = new Core\Routing\UrlParser();
-		var_dump($_SERVER['REQUEST_URI']);
-		$this->uri = $parser->parse_url($_SERVER['REQUEST_URI']);
-		$this->query = $parser->parse_query_string($_SERVER["QUERY_STRING"]);
+		$router = new Core\Routing\Router();
+
+		$router->get_matching_route();
+
+		// $this->uri = $parser->parse_url($_SERVER['REQUEST_URI']);
+		// $this->query = $parser->parse_query_string($_SERVER["QUERY_STRING"]);
 
 		return $this;
 	}
@@ -21,9 +23,9 @@ function request()
 	return (new Helpers)->request();	
 }
 
-function router($routes, $uri)
+function router($routes)
 {
-	return new Core\Routing\Router($routes, $uri);
+	return new Core\Routing\Router($routes);
 }
 
 function view(string $view_name, array $data = [])
