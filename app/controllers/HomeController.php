@@ -16,6 +16,6 @@ class HomeController extends Controller
 
 	public function regex_route()
 	{
-		echo "regex route. <br>";
+		return view("homepage", ["name" => "Blog"]);
 	}
 }

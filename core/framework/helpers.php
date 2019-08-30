@@ -2,16 +2,33 @@
 
 class Helpers
 {
-	public $uri, $query;
+	private function set_url_params_as_properties()
+	{
+		$matching_route = (new Core\Routing\Router)->get_matching_route();
+		$params_arr = (new Core\Routing\UrlParser)->get_params_from_route($matching_route);
+
+		// foreach ($params_arr as $key => $value)
+		// {
+		// 	$this->{$key} = $value;
+		// }
+	}
+
+	private function set_query_params_as_properties()
+	{
+		$parser = new Core\Routing\UrlParser;
+		$query_arr = $parser->parse_query_string();
+
+		foreach ($query_arr as $key => $value)
+		{
+			$this->{$key} = $value;
+		}
+	}
 
 	public function request()
 	{
-		$router = new Core\Routing\Router();
+		$this->set_url_params_as_properties();
 
-		$router->get_matching_route();
-
-		// $this->uri = $parser->parse_url($_SERVER['REQUEST_URI']);
-		// $this->query = $parser->parse_query_string($_SERVER["QUERY_STRING"]);
+		$this->set_query_params_as_properties();
 
 		return $this;
 	}
@@ -23,9 +40,9 @@ function request()
 	return (new Helpers)->request();	
 }
 
-function router($routes)
+function router()
 {
-	return new Core\Routing\Router($routes);
+	return new Core\Routing\Router();
 }
 
 function view(string $view_name, array $data = [])

@@ -26,10 +26,20 @@ class UrlParser
 		return $this->remove_url_prefix($url);
 	}
 
-	public function parse_query_string($query_string)
+	public function parse_query_string()
 	{
-		parse_str($query_string, $str);
-		return $str;
+		parse_str($_SERVER["QUERY_STRING"], $arr);
+		return $arr;
+	}
+
+	public function get_params_from_route($route)
+	{
+		if (strpos($key, "{") === false)
+		{
+			
+		}
+
+		var_dump($route);
 	}
 
 }

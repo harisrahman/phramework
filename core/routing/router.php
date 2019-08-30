@@ -9,9 +9,10 @@ class Router
 {
 	private $routes, $uri, $method, $route_string, $controller, $action;
 
-	function __construct(array $routes)
+	function __construct()
 	{
-		$this->routes = $this->remove_first_slashes($routes);
+		require __DIR__. '/../../routes/web.php';
+		$this->routes = $routes;
 	}
 
 	private function remove_first_slashes(array $routes) : array
@@ -99,8 +100,6 @@ class Router
 
 	public function run()
 	{
-		var_dump($this->get_matching_route());
-
 		if ($this->get_matching_route() !== false)
 		{
 			return $this->set_controller_and_action();
