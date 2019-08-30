@@ -32,14 +32,26 @@ class UrlParser
 		return $arr;
 	}
 
-	public function get_params_from_route($route)
+	public function get_params_from_route(string $url, string $route) : array
 	{
-		if (strpos($key, "{") === false)
+		$params_arr = [];
+
+		if (strpos($route, "={") === false) return $params_arr;
+
+		$url_arr = explode("/", $url);
+		$route_arr = explode("/", $route);
+
+		if (count($url_arr) != count($route_arr)) return $params_arr;
+		
+		foreach ($route_arr as $url_piece_key => $url_piece)
 		{
-			
+			if (($var_name_end = strpos($url_piece, "={")) !== false)
+			{
+				$params_arr[substr($url_piece, 0, $var_name_end)] = $url_arr[$url_piece_key];
+			}
 		}
 
-		var_dump($route);
+		return $params_arr;
 	}
 
 }

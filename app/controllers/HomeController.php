@@ -16,6 +16,6 @@ class HomeController extends Controller
 
 	public function regex_route()
 	{
-		return view("homepage", ["name" => "Blog"]);
+		return view("blog", ["name" => "Blog"]);
 	}
 }

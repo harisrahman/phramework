@@ -1,34 +1,42 @@
 <?php
 
+use Core\Routing\UrlParser;
+use Core\Routing\Router;
+
 class Helpers
 {
-	private function set_url_params_as_properties()
+
+	private function set_properties_from_array(array $arr)
 	{
-		$matching_route = (new Core\Routing\Router)->get_matching_route();
-		$params_arr = (new Core\Routing\UrlParser)->get_params_from_route($matching_route);
-
-		// foreach ($params_arr as $key => $value)
-		// {
-		// 	$this->{$key} = $value;
-		// }
-	}
-
-	private function set_query_params_as_properties()
-	{
-		$parser = new Core\Routing\UrlParser;
-		$query_arr = $parser->parse_query_string();
-
-		foreach ($query_arr as $key => $value)
+		foreach ($arr as $key => $value)
 		{
 			$this->{$key} = $value;
 		}
 	}
 
+	private function set_url_params()
+	{
+		$matching_route = (new Router)->get_matching_route();
+		
+		$parser = new UrlParser;
+		$curr_url = $parser->parse_url($_SERVER['REQUEST_URI']);
+		$params_arr = $parser->get_params_from_route($curr_url, $matching_route);
+
+		$this->set_properties_from_array($params_arr);
+	}
+
+	private function set_query_params()
+	{
+		$parser = new Core\Routing\UrlParser;
+		$query_arr = $parser->parse_query_string();
+
+		$this->set_properties_from_array($query_arr);
+	}
+
 	public function request()
 	{
-		$this->set_url_params_as_properties();
-
-		$this->set_query_params_as_properties();
+		$this->set_url_params();
+		$this->set_query_params();
 
 		return $this;
 	}
@@ -37,7 +45,7 @@ class Helpers
 
 function request()
 {
-	return (new Helpers)->request();	
+	return (new Helpers)->request();
 }
 
 function router()
