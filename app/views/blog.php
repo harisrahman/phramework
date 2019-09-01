@@ -4,6 +4,6 @@
 	<title></title>
 </head>
 <body>
-	<h1>Blog <?= request()->ix ?></h1>
+	<h1>Blog <?= request()->id ?></h1>
 </body>
 </html>
