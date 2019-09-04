@@ -2,10 +2,16 @@
 
 namespace App\Controllers;
 
+use Core\Framework\Controller;
+use App\Models\User;
+
 class HomeController extends Controller
 {
 	public function index()
 	{
+		$user = new User;
+		var_dump($user->get_data());
+
 		return view("homepage", ["name" => "Haris"]);
 	}
 
