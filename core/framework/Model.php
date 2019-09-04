@@ -4,25 +4,11 @@ namespace Core\Framework;
 
 class Model
 {
-/**
- * Connection to DB
- */
-	public function conn()
+	protected $db;
+
+	function __construct()
 	{
-		try
-		{
-			$dsn = getenv("DB_CONNECTION") . ":host=" . getenv("DB_HOST") . ";dbname=" . getenv("DB_DATABASE");
-		 	$options = [
-				PDO::ATTR_EMULATE_PREPARES   => false, // turn off emulation mode for "real" prepared statements
-				PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, //turn on errors in the form of exceptions
-				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, //make the default fetch be an associative array
-			];
-		 	return new PDO($dsn, getenv("DB_USERNAME"), getenv("DB_PASSWORD"), $options);
-		}
-		catch(PDOException $e)
-		{
-			exit("Connection failed: " . $e->getMessage());
-		}
+		$this->db = new Database;
 	}
 
 /**
@@ -111,18 +97,6 @@ class Model
 		return $data_mod;
 	}
 
-
-	public function insert(array $data) : bool
-	{
-		$insert = $this->compile_insert($data);
-
-		$stmt = $this->conn()->prepare($insert["query"]);
-		$result = $stmt->execute($insert["parameters"]);
-		$stmt = null;
-
-		return $result;
-	}
-
 	private function compile_select(array $selects = []) : string
 	{
 		$query = "SELECT ";
@@ -140,18 +114,18 @@ class Model
 		return $query;
 	}
 
-	public function select(array $selects = []) : bool
+	public function insert(array $data) : bool
+	{
+		$insert = $this->compile_insert($data);
+
+		return $this->db->manipulate_db($insert["query"], $insert["parameters"]);
+	}
+
+	public function select(array $selects = []) : array
 	{
 		$query = $this->compile_select($selects);
+		$result = $this->db->query_db($query);
 
-		// var_dump($query);
-
-		$stmt = $this->conn()->prepare($query);
-		$result = $stmt->execute();
-		$arr = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-		$stmt = null;
-
-		return $arr;
+		return $result;
 	}
 }
