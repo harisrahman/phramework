@@ -26,7 +26,7 @@ class UrlParser
 		return $this->remove_url_prefix($url);
 	}
 
-	public function parse_query_string()
+	public function parse_query_string() : array
 	{
 		parse_str($_SERVER["QUERY_STRING"], $arr);
 		return $arr;

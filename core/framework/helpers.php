@@ -5,16 +5,7 @@ use Core\Routing\Router;
 
 class Helpers
 {
-
-	private function set_properties_from_array(array $arr)
-	{
-		foreach ($arr as $key => $value)
-		{
-			$this->{$key} = $value;
-		}
-	}
-
-	private function set_url_params()
+	private function get_url_params() : array
 	{
 		$matching_route = (new Router)->get_matching_route();
 		
@@ -22,25 +13,28 @@ class Helpers
 		$curr_url = $parser->parse_url($_SERVER['REQUEST_URI']);
 		$params_arr = $parser->get_params_from_route($curr_url, $matching_route);
 
-		$this->set_properties_from_array($params_arr);
+		return $params_arr;
 	}
 
-	private function set_query_params()
+	private function get_query_params() : array
 	{
 		$parser = new Core\Routing\UrlParser;
 		$query_arr = $parser->parse_query_string();
 
-		$this->set_properties_from_array($query_arr);
+		return $query_arr;
 	}
 
 	public function request()
 	{
-		$this->set_url_params();
-		$this->set_query_params();
-
-		return $this;
+		$coll = collect($this->get_url_params());
+		return $coll->add($this->get_query_params());
 	}
 
+}
+
+function collect($arr = [])
+{
+	return new Core\Framework\Collection($arr);
 }
 
 function request()
