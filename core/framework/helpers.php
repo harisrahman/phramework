@@ -32,9 +32,31 @@ class Helpers
 
 }
 
-function collect($arr = [])
+function collect($arr = [], bool $is_recursive = false)
 {
-	return new Core\Framework\Collection($arr);
+	return new Core\Framework\Collection($arr, $is_recursive);
+
+/**
+ * Recursive collection example
+
+	$x = collect([ "a" =>
+	[
+		"c" =>
+		[
+			"x" => "A",
+			"y" => "C"
+		],
+		"y" =>  "y",
+		"x" =>
+		[
+			"x" => "A",
+			"y" => "C"
+		],
+	],
+	"b" => "y" ], true);
+
+	var_dump($x->a->x->x);
+ */
 }
 
 function request()

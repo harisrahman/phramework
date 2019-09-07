@@ -10,20 +10,15 @@ class Collection implements Countable
 	
 	function __construct(array $items = [], bool $is_recursive = false)
 	{
+		$this->items = $items;
+
 		if ($is_recursive)
-		{
-
-		}
-		else
-		{
-			$this->items = $items;
-		}
-
+			$this->items = $this->set_recursive($this)->items;
 	}
 
 	public function __set($propName, $value)
 	{
-		$this->set($propName, $value);		
+		$this->set($propName, $value);
 	}
 
 	public function __get($propName)
@@ -36,9 +31,16 @@ class Collection implements Countable
 		return $this->to_json();
 	}
 
-	private function FunctionName($value='')
+	private function set_recursive(Collection $coll) : object
 	{
-		
+		foreach ($coll->items as $key => $value)
+		{
+			if (is_array($value))
+				$coll->items[$key] = $coll->set_recursive(new Collection($value));
+			else
+				$coll->items[$key] = $value;
+		}
+		return $coll;
 	}
 
 	private function set($key, $value)
