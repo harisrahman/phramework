@@ -9,7 +9,7 @@ $routes = [
 
 	],
 
-	"/blah" => "blah@HomeController",
+	"/db" => "orm_demo@HomeController",
 
 	"blogs/blog/id={\d+}" => "regex_route@HomeController",
 

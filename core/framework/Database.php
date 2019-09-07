@@ -4,10 +4,12 @@ namespace Core\Framework;
 
 class Database
 {
+	private $conn;
+
 /**
  * Connection to DB
  */
-	public function conn()
+	public function __construct()
 	{
 		try
 		{
@@ -17,9 +19,9 @@ class Database
 				\PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION, //turn on errors in the form of exceptions
 				\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, //make the default fetch be an associative array
 			];
-		 	return new \PDO($dsn, getenv("DB_USERNAME"), getenv("DB_PASSWORD"), $options);
+		 	$this->conn = new \PDO($dsn, getenv("DB_USERNAME"), getenv("DB_PASSWORD"), $options);
 		}
-		catch(PDOException $e)
+		catch(\PDOException $e)
 		{
 			exit("Connection failed: " . $e->getMessage());
 		}
@@ -28,23 +30,29 @@ class Database
 /**
  * For insert, update, delete queries
  */
-	public function manipulate_db(string $query, array $parameters) : bool
+	public function manipulate_db(string $query, array $parameters = []) : bool
 	{
-		$stmt = $this->conn()->prepare($query);
-		$result = $stmt->execute($parameters);
+		$stmt = $this->conn->prepare($query);
+		$stmt->execute($parameters);
+		$result = $stmt->rowCount();
 		$stmt = null;
 
-		return $result;
+		return $result > 0;
+	}
+
+	public function get_last_id()
+	{
+		return $this->conn->lastInsertId();
 	}
 
 /**
  * For select queries
  */
-	public function query_db($query) : array
+	public function query_db($query, array $parameters = []) : array
 	{
-		$stmt = $this->conn()->prepare($query);
-		$stmt->execute();
-		$arr = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$stmt = $this->conn->prepare($query);
+		$stmt->execute($parameters);
+		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		$stmt = null;
 
 		return $result;

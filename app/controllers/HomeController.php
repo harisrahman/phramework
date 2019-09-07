@@ -9,15 +9,21 @@ class HomeController extends Controller
 {
 	public function index()
 	{
-		$user = new User;
-		var_dump($user->get_data());
-
-		return view("homepage", ["name" => "Haris"]);
+		return view("homepage", ["name" => "Human"]);
 	}
 
-	public function blah()
+	public function orm_demo()
 	{
-		echo "normal route. <br>";
+		$user_model = new User;
+
+		// $result = $user_model->add("Haris", 24);
+		// $result = $user_model->update_by_id(1, ["name" => "John", "age" => 40]);
+		// $result = $user_model->delete_by_id(1);
+
+		// $result = $user_model->get_by_name_age("Haris", 24);
+		$result = $user_model->get_by_name_like("Hari");
+
+		return view("homepage", ["name" => $result->{0}->name]);
 	}
 
 	public function regex_route()

@@ -5,10 +5,20 @@ namespace Core\Framework;
 class Model
 {
 	protected $db;
+	protected $query = "";
+	protected $wheres = "";
+	protected $params = [];
 
 	function __construct()
 	{
 		$this->db = new Database;
+	}
+
+	private function clear()
+	{
+		$this->query = "";
+		$this->wheres = "";
+		$this->params = [];
 	}
 
 /**
@@ -38,10 +48,19 @@ class Model
 /**
  * array to (?, ?, ...)
  */
-	private function question_marked_parameters(array $record) : string
+	private function question_marked_params_for_insert(array $record) : string
 	{
 		return '('. $this->question_markify($record) .')';
 	}
+
+/**
+ * array to (x=?, y=?, ...)
+ */
+	private function question_marked_params_for_update(string $column) : string
+	{
+		return "$column = ?";
+	}
+
 
 /**
  * Flattens array form associative to normal (keys as 0, 1 ...)
@@ -65,19 +84,27 @@ class Model
 		return $data;
 	}
 
-	private function compile_insert(array $values) : array
+	private function compile_insert(array $values)
 	{
 //Force array to become multi dimension
 		if (! is_array(reset($values))) $values = [$values];
 
 		$columns = $this->commafy(array_keys(reset($values)));
-		$parameter_placeholders = $this->commafy(array_map([$this, "question_marked_parameters"], $values));
+		$parameter_placeholders = $this->commafy(array_map([$this, "question_marked_params_for_insert"], $values));
 		$actual_parameters = $this->flatten_array($values);
 
-		return [
-				"query" => "INSERT INTO $this->table ($columns) VALUES $parameter_placeholders;",
-				"parameters" => $actual_parameters
-		];
+		$this->query = "INSERT INTO $this->table ($columns) VALUES $parameter_placeholders;";
+		$this->params = $actual_parameters;
+	}
+
+	private function compile_update(array $values)
+	{
+		$columns = array_keys($values);
+
+		$parameter_placeholders = $this->commafy(array_map([$this, "question_marked_params_for_update"], $columns));
+
+		$this->query = "UPDATE $this->table SET $parameter_placeholders";
+		$this->params = array_merge(array_values($values), $this->params);
 	}
 
 	public function sql_date_format(mixed $replace_at, array $data) : array
@@ -103,29 +130,87 @@ class Model
 
 		if (empty($selects))
 		{
-			$query .= "* ";
+			$query .= "*";
 		}
 		else
 		{
 			$query .= implode(", ", $selects);
 		}
-		$query .= " FROM " . $this->table . ";";
+		$query .= " FROM " . $this->table;
 
 		return $query;
 	}
 
-	public function insert(array $data) : bool
+	public function insert(array $data)
 	{
-		$insert = $this->compile_insert($data);
+		$this->compile_insert($data);
+		$result = $this->db->manipulate_db($this->query, $this->params);
 
-		return $this->db->manipulate_db($insert["query"], $insert["parameters"]);
+		$this->clear();
+		return $result ? $this->db->get_last_id() : false;
 	}
 
-	public function select(array $selects = []) : array
+	public function update(array $data)
 	{
-		$query = $this->compile_select($selects);
-		$result = $this->db->query_db($query);
+		if ($this->wheres == "") return false;
 
+		$this->compile_update($data);
+		$result = $this->db->manipulate_db("$this->query $this->wheres;", $this->params);
+
+		$this->clear();
 		return $result;
+	}
+
+	public function delete() : bool
+	{
+		if ($this->wheres == "") return false;
+
+		$result = $this->db->manipulate_db("DELETE FROM $this->table $this->wheres;", $this->params);
+
+		$this->clear();
+		return $result;
+	}
+
+	public function select(array $selects = []) : object
+	{
+		$this->query = $this->compile_select($selects);
+
+		return $this;
+	}
+
+	public function where(string $column, string $operator = "=", string $value = null) : object
+	{
+		if (func_num_args() == 1)
+			$value = "NULL";
+		elseif (func_num_args() == 2)
+			$value = $operator;
+
+		if (func_num_args() < 3) $operator = "=";
+
+		if (trim($this->wheres) == "")
+			$this->wheres = "WHERE $column $operator ?";
+		else
+			$this->wheres .= " AND $column $operator ? "; 
+
+
+		$this->params[] = $value;
+
+		return $this;
+	}
+
+	public function raw($query, array $params)
+	{
+		$this->query .= " " . trim($query);
+		$this->params = array_merge($this->params, $params);
+
+		return $this;
+	}
+
+	public function get($reursive_coll = true)
+	{
+		$result = $this->db->query_db("$this->query $this->wheres;", $this->params);
+
+		$this->clear();
+		return collect($result, $reursive_coll);
 	}
 }

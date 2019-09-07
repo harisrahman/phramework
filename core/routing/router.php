@@ -12,7 +12,7 @@ class Router
 	function __construct()
 	{
 		require __DIR__. '/../../routes/web.php';
-		$this->routes = $routes;
+		$this->routes = $this->remove_first_slashes($routes);
 	}
 
 	private function remove_first_slashes(array $routes) : array

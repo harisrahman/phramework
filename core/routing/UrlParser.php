@@ -2,9 +2,6 @@
 
 namespace Core\Routing;
 
-/**
- * Routes URLs
- */
 class UrlParser
 {
 	private function remove_url_prefix($url)
@@ -26,7 +23,7 @@ class UrlParser
 		return $this->remove_url_prefix($url);
 	}
 
-	public function parse_query_string() : array
+	public function get_query_params() : array
 	{
 		parse_str($_SERVER["QUERY_STRING"], $arr);
 		return $arr;
@@ -50,6 +47,16 @@ class UrlParser
 				$params_arr[substr($url_piece, 0, $var_name_end)] = $url_arr[$url_piece_key];
 			}
 		}
+
+		return $params_arr;
+	}
+
+	public function get_url_params() : array
+	{
+		$matching_route = (new Router)->get_matching_route();
+		
+		$curr_url = $this->parse_url($_SERVER['REQUEST_URI']);
+		$params_arr = $this->get_params_from_route($curr_url, $matching_route);
 
 		return $params_arr;
 	}
