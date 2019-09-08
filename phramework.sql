@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `users` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` int(8) UNSIGNED NOT NULL,
   `name` varchar(50) COLLATE utf8mb4_unicode_520_ci NOT NULL,
   `age` int(3) NOT NULL,
   `created_on` datetime NOT NULL
@@ -41,8 +41,9 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `name`, `age`, `created_on`) VALUES
 (1, 'Haris', 24, '2019-09-07 14:07:14'),
-(2, 'Person X', 40, '2019-09-07 14:07:41'),
-(3, 'John', 40, '2019-09-07 16:34:35');
+(2, 'John', 32, '2019-09-07 14:07:41'),
+(3, 'Harisson', 45, '2019-09-07 14:08:05'),
+(4, 'Saurabh', 30, '2019-09-07 16:34:35');
 
 --
 -- Indexes for dumped tables
@@ -62,7 +63,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

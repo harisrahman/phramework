@@ -37,6 +37,7 @@ class User extends Model
 	{
 		return $this->select()
 					->raw("WHERE name LIKE ?", [$name . "%"	])
+					->limit(1)
 					->get();
 	}
 

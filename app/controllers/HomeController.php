@@ -23,7 +23,7 @@ class HomeController extends Controller
 		// $result = $user_model->get_by_name_age("Haris", 24);
 		$result = $user_model->get_by_name_like("Hari");
 
-		return view("homepage", ["name" => $result->{0}->name]);
+		return view("homepage", ["name" => $result->first()->name]);
 	}
 
 	public function regex_route()

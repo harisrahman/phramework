@@ -68,6 +68,16 @@ class Collection implements Countable
 		return count($this->items);
 	}
 
+	public function first()
+	{
+		return reset($this->items);
+	}
+
+	public function last()
+	{
+		return end($this->items);
+	}
+
 	public function add($new_items)
 	{
 		if (is_array($new_items))

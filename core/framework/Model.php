@@ -7,6 +7,7 @@ class Model
 	protected $db;
 	protected $query = "";
 	protected $wheres = "";
+	protected $limit = "";
 	protected $params = [];
 
 	function __construct()
@@ -155,7 +156,7 @@ class Model
 		if ($this->wheres == "") return false;
 
 		$this->compile_update($data);
-		$result = $this->db->manipulate_db("$this->query $this->wheres;", $this->params);
+		$result = $this->db->manipulate_db("$this->query $this->wheres $this->limit;", $this->params);
 
 		$this->clear();
 		return $result;
@@ -165,7 +166,7 @@ class Model
 	{
 		if ($this->wheres == "") return false;
 
-		$result = $this->db->manipulate_db("DELETE FROM $this->table $this->wheres;", $this->params);
+		$result = $this->db->manipulate_db("DELETE FROM $this->table $this->wheres $this->limit;", $this->params);
 
 		$this->clear();
 		return $result;
@@ -190,10 +191,17 @@ class Model
 		if (trim($this->wheres) == "")
 			$this->wheres = "WHERE $column $operator ?";
 		else
-			$this->wheres .= " AND $column $operator ? "; 
+			$this->wheres .= " AND $column $operator ? ";
 
 
 		$this->params[] = $value;
+
+		return $this;
+	}
+
+	public function limit(int $num)
+	{
+		$this->limit = "LIMIT $num";
 
 		return $this;
 	}
@@ -208,7 +216,7 @@ class Model
 
 	public function get($reursive_coll = true)
 	{
-		$result = $this->db->query_db("$this->query $this->wheres;", $this->params);
+		$result = $this->db->query_db("$this->query $this->wheres $this->limit;", $this->params);
 
 		$this->clear();
 		return collect($result, $reursive_coll);
