@@ -2,7 +2,7 @@
 
 namespace Core\Framework;
 
-class Model
+abstract class Model
 {
 	protected $db;
 	protected $query = "";

@@ -35,6 +35,16 @@ function now()
 	return date("Y-m-d H:i:s");
 }
 
+function xss(string $text)
+{
+	return (new Core\Framework\Security)->xss($text);
+}
+
+function csrf(bool $only_token = false)
+{
+	return (new Core\Framework\Security)->csrf($only_token);
+}
+
 function collect($arr = [], bool $is_recursive = false)
 {
 	return new Core\Framework\Collection($arr, $is_recursive);
