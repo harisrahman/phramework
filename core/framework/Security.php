@@ -16,11 +16,11 @@ class Security
 
 		if ($only_token)
 		{
-			return $token;
+			echo $token;
 		}
 		else
 		{
-			return '<input type="hidden" name="csrf_token" value="' . $token . '">';
+			echo '<input type="hidden" name="csrf_token" value="' . $token . '">';
 		}
 	}
 
