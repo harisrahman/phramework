@@ -13,4 +13,6 @@ $routes = [
 
 	"blogs/blog/id={\d+}" => "regex_route@HomeController",
 
+	"/form" => "form@HomeController",
+
 ];

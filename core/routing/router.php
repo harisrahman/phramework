@@ -2,6 +2,8 @@
 
 namespace Core\Routing;
 
+use Core\Framework\Controller as BaseController;
+
 /**
  * Routes URLs
  */
@@ -77,8 +79,24 @@ class Router
 		$route_string_arr = explode("@", $this->route_string);
 
 		$controller = "\App\Controllers\\" . $route_string_arr[1];
-		$this->controller = new $controller;
-		$this->action = $this->controller->{$route_string_arr[0]}();
+		
+		if (class_exists($controller))
+		{
+			$this->controller = new $controller;
+		}
+		else
+		{
+			(new BaseController)->error_500("Route controller " . $route_string_arr[1] ." not found.");
+		}
+
+		if (method_exists ($this->controller , $route_string_arr[0])) 
+		{
+			$this->action = $this->controller->{$route_string_arr[0]}();
+		}
+		else
+		{
+			(new BaseController)->error_500("Route action " . $route_string_arr[0] . " not found in " . $route_string_arr[1] . " class.");
+		}
 	}
 
 	public function get_matching_route()

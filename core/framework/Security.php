@@ -6,7 +6,7 @@ class Security
 {
 	public function generate_csrf_token()
 	{
-		$token = $_SESSION['csrf_token'];
+		$token = $_SESSION['csrf_token'] ?? null;
 
 		if (empty($token))
 		{
@@ -18,8 +18,7 @@ class Security
 
 	public function verify_csrf_token()
 	{
-		return !empty($_POST['token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token']);
-
+		return !empty($_POST['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token']);
 	}
 
 	public function csrf(bool $only_token = false)
@@ -28,11 +27,11 @@ class Security
 
 		if ($only_token)
 		{
-			echo $token;
+			return $token;
 		}
 		else
 		{
-			echo '<input type="hidden" name="csrf_token" value="' . $token . '">';
+			return '<input type="hidden" name="csrf_token" value="' . $token . '">';
 		}
 	}
 

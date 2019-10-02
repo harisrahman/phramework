@@ -13,6 +13,25 @@ function router()
 	return new Core\Routing\Router();
 }
 
+function view_exists(string $view_name)
+{
+	$view_file = getcwd() . "/app/views/" . $view_name . ".php";
+
+	return file_exists($view_file);
+}
+
+function view_or_msg(string $view_name, string $msg = "")
+{
+	if (view_exists("errors/416"))
+	{
+		return view("errors/416", ["msg" => $msg]);
+	}
+	else
+	{
+		exit($msg);
+	}
+}
+
 function view(string $view_name, array $data = [])
 {
 	$view_file = getcwd() . "/app/views/" . $view_name . ".php";
