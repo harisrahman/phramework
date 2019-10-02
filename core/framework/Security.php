@@ -6,8 +6,20 @@ class Security
 {
 	public function generate_csrf_token()
 	{
+		$token = $_SESSION['csrf_token'];
 
-		return "token";
+		if (empty($token))
+		{
+			$_SESSION['csrf_token'] = $token = bin2hex(random_bytes(32));
+		}
+
+		return $token;
+	}
+
+	public function verify_csrf_token()
+	{
+		return !empty($_POST['token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token']);
+
 	}
 
 	public function csrf(bool $only_token = false)

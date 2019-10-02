@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 /**
  * Composer autoloader file, to use PSR-4 autoloading
  */
