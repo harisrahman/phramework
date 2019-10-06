@@ -13,7 +13,7 @@ class Router
 
 	function __construct()
 	{
-		require __DIR__. '/../../routes/web.php';
+		require(__DIR__. '/../../routes/web.php');
 		$this->routes = $this->remove_first_slashes($routes);
 	}
 
@@ -28,7 +28,7 @@ class Router
 		return $arr;
 	}
 
-	private function generate_regex(string $subject)
+	private function generate_regex(string $subject) : string
 	{
 		$uri_arr = explode("/", $subject);
 
@@ -89,7 +89,7 @@ class Router
 			(new BaseController)->error_500("Route controller " . $route_string_arr[1] ." not found.");
 		}
 
-		if (method_exists ($this->controller , $route_string_arr[0])) 
+		if (method_exists($this->controller , $route_string_arr[0])) 
 		{
 			$this->action = $this->controller->{$route_string_arr[0]}();
 		}
@@ -123,6 +123,6 @@ class Router
 			return $this->set_controller_and_action();
 		}
 //Return 404
-		return (new \Core\Framework\Controller)->not_found();
+		return (new \Core\Framework\Controller)->error_404();
 	}
 }

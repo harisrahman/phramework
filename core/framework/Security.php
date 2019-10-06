@@ -6,9 +6,7 @@ class Security
 {
 	public function generate_csrf_token() : string
 	{
-		$token = $_SESSION['csrf_token'] ?? null;
-
-		if (empty($token))
+		if (empty($_SESSION['csrf_token']))
 		{
 			if (function_exists('random_bytes'))
 			{
@@ -26,7 +24,7 @@ class Security
 			$_SESSION['csrf_token'] = $token;
 		}
 
-		return $token;
+		return $_SESSION['csrf_token'];
 	}
 
 	public function verify_csrf_token() : bool
@@ -50,6 +48,6 @@ class Security
 
 	public function xss(string $text) : string
 	{
-		return htmlspecialchars($text);
+		return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 	}
 }

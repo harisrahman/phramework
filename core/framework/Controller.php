@@ -2,30 +2,30 @@
 
 namespace Core\Framework;
 
-use Core\Framework\Security;
-
 class Controller
 {
 	function __construct()
 	{
+		$secutity = Core\Framework\Security;
+
 //Generate security token if it does not exist 
-		(new Security)->generate_csrf_token();
+		$secutity->generate_csrf_token();
 
 		if (strtolower($_SERVER['REQUEST_METHOD']) == "post")
 		{
-			if ((new Security)->verify_csrf_token() === false)
+			if ($secutity->verify_csrf_token() === false)
 			{
-				return $this->page_expired("This page has expired");
+				return $this->error_419("This page has expired");
 			}
 		}
 	}
 
-	public function page_expired(string $msg = "")
+	public function error_419(string $msg = "")
 	{
 		return view_or_msg("errors/419", $msg);
 	}
 
-	public function not_found(string $msg = "")
+	public function error_404(string $msg = "")
 	{
 		http_response_code(404);
 		return view_or_msg("errors/404", $msg);

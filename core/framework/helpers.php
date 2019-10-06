@@ -22,9 +22,9 @@ function view_exists(string $view_name)
 
 function view_or_msg(string $view_name, string $msg = "")
 {
-	if (view_exists("errors/416"))
+	if (view_exists($view_name))
 	{
-		return view("errors/416", ["msg" => $msg]);
+		return view($view_name, ["msg" => $msg]);
 	}
 	else
 	{
@@ -54,12 +54,12 @@ function now()
 	return date("Y-m-d H:i:s");
 }
 
-function xss(string $text)
+function xss(string $text) : string 
 {
 	return (new Core\Framework\Security)->xss($text);
 }
 
-function csrf(bool $only_token = false)
+function csrf(bool $only_token = false) : string
 {
 	return (new Core\Framework\Security)->csrf($only_token);
 }
