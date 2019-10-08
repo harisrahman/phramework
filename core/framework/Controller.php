@@ -6,14 +6,14 @@ class Controller
 {
 	function __construct()
 	{
-		$secutity = Core\Framework\Security;
+		$security = Core\Framework\Security;
 
 //Generate security token if it does not exist 
-		$secutity->generate_csrf_token();
+		$security->generate_csrf_token();
 
 		if (strtolower($_SERVER['REQUEST_METHOD']) == "post")
 		{
-			if ($secutity->verify_csrf_token() === false)
+			if ($security->verify_csrf_token() === false)
 			{
 				return $this->error_419("This page has expired");
 			}
