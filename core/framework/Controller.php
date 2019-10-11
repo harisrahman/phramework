@@ -6,7 +6,7 @@ class Controller
 {
 	function __construct()
 	{
-		$security = Core\Framework\Security;
+		$security = new Security;
 
 //Generate security token if it does not exist 
 		$security->generate_csrf_token();

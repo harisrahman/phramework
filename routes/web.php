@@ -1,6 +1,7 @@
 <?php
 
-$routes = [
+$routes =
+[
 
 	"/" => [
 
