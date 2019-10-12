@@ -40,7 +40,7 @@ Routes can be defined generally for all request types at once by defining value 
 
 ### ORM
 
-The simple ORM provides methods for
+ORM is done by using Model classes where class has a `protected` variable `$table_name` which is a string containing name of the table where database operations are to be executed.
 
 
 ### Security
@@ -50,3 +50,5 @@ Every session has its own csrf token. GET request don't need token verification 
 
 ### Helpers
 
+`view($view_name, $data)` : Used to call a view with, data to be passed. 
+`$data` contains the variables and their values to be passed into the view. An associative array with key as variable name and value as variable value is used. 
