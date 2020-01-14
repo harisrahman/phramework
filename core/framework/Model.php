@@ -78,9 +78,23 @@ abstract class Model
 		return $return;
 	}
 
-	public function extract_values_of_key()
+	public function extract_values_of_key(string $needle, array $arr) : array
 	{
-		
+		$result = [];
+
+		foreach ($arr as $key => $value)
+		{
+			if (is_array($value))
+			{
+				if (array_key_exists($needle, $value)) $result[] = $value[$needle]; 
+			}
+			elseif($key === $needle)
+			{
+				$result[] = $value;
+			}
+		}
+
+		return $result;
 	}
 
 	private function escape_characters(array $data) : array
@@ -144,9 +158,13 @@ abstract class Model
 					throw new Exception($relation_data[0] . " class in relation " . $relation . " does not exist");
 				}
 
-				$foreign_key_values = extract_values_of_key($main_result)
+				$foreign_key_values = $this->extract_values_of_key($local_key, $main_result);
 
-				$result = $this->whereIn($foreign_key, $foreign_key_values, $table_name);
+				$result = $this->
+							select()			
+							->whereIn($foreign_key, $foreign_key_values);
+
+				$this->
 
 				var_dump($result);
 				exit();
@@ -251,18 +269,18 @@ abstract class Model
 		return $this;
 	}
 
-	public function whereIn(string $column, array $values, string $table = null) : object
+	public function whereIn(string $column, array $values) : object
 	{
-		if ($table == null) $table = $this->table;
-
 		if (trim($this->wheres) != "")
 			$this->wheres = " WHERE";
 		else
 			$this->wheres .= " AND" ;
 
-		$this->wheres .= "$table.$column IN (" . question_markify($values) . ")";
+		$this->wheres .= " $column IN (" . $this->question_markify($values) . ")";
 
 		$this->params = array_merge($this->params, $values);
+		
+		return $this;
 	}
 
 	public function limit(int $num)
