@@ -105,8 +105,8 @@ class Router
 
 		$this->uri = $parser->parse_url($_SERVER['REQUEST_URI']);
 
-//First check if exact route exists
-//Then match if regex route exists
+		//First check if exact route exists
+		//Then match if regex route exists
 		if ((array_key_exists($this->uri, $this->routes) ||
 			$this->uri = $this->route_match($this->uri, $this->routes))
 			&& $this->is_method_defined())
@@ -122,7 +122,7 @@ class Router
 		{
 			return $this->set_controller_and_action();
 		}
-//Return 404
+		//Return 404
 		return (new \Core\Framework\Controller)->error_404();
 	}
 }

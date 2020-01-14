@@ -4,6 +4,6 @@
 	<title></title>
 </head>
 <body>
-	<h1>Welcome Home <?= $name ?? "Buddy" ?></h1>
+	<h1><?= $name ?? "Buddy" ?></h1>
 </body>
 </html>

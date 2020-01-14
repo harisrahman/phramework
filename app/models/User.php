@@ -7,6 +7,12 @@ use Core\Framework\Model;
 class User extends Model
 {
 	protected $table = 'users';
+	protected $dates = ['created_on'];
+
+	public function tokens()
+	{
+		return ['UserToken', 'id', 'user_id'];
+	}
 
 	public function add($name, $age)
 	{
@@ -45,6 +51,13 @@ class User extends Model
 	{
 		return $this->where("id", $id)
 					->update($data);
+	}
+
+	public function get_by_name_with_token($name)
+	{
+		return $this->where("name", $name)
+					->with("tokens")
+					->get();
 	}
 
 

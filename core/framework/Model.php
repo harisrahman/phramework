@@ -2,6 +2,8 @@
 
 namespace Core\Framework;
 
+use Exception;
+
 abstract class Model
 {
 	protected $db;
@@ -9,6 +11,8 @@ abstract class Model
 	protected $wheres = "";
 	protected $limit = "";
 	protected $params = [];
+	protected $withs = [];
+	protected $default_date_format = "Y-m-d";
 
 	function __construct()
 	{
@@ -20,6 +24,7 @@ abstract class Model
 		$this->query = "";
 		$this->wheres = "";
 		$this->params = [];
+		$this->withs = [];
 	}
 
 /**
@@ -73,6 +78,11 @@ abstract class Model
 		return $return;
 	}
 
+	public function extract_values_of_key()
+	{
+		
+	}
+
 	private function escape_characters(array $data) : array
 	{
 		foreach ($data as $key_1 => $value_1)
@@ -87,7 +97,7 @@ abstract class Model
 
 	private function compile_insert(array $values)
 	{
-//Force array to become multi dimension
+		//Force array to become multi dimension
 		if (! is_array(reset($values))) $values = [$values];
 
 		$columns = $this->commafy(array_keys(reset($values)));
@@ -108,6 +118,46 @@ abstract class Model
 		$this->params = array_merge(array_values($values), $this->params);
 	}
 
+	private function compile_withs($main_result)
+	{
+		foreach ($this->withs as $relation)
+		{
+			if (method_exists($this, $relation))
+			{
+				$relation_data = $this->{$relation}();
+
+				if (count($relation_data) < 2)
+				{
+					throw new Exception("Too few arguments in " . $relation . " in " . get_class($this));
+				}
+
+				$local_key = count($relation_data) > 2 ? $relation_data[1] : "id";
+				$foreign_key = end($relation_data);
+				$foreign_class = "\App\Models\\" . $relation_data[0];
+
+				if (class_exists($foreign_class))
+				{
+					$table_name = (new $foreign_class)->table;
+				}
+				else
+				{
+					throw new Exception($relation_data[0] . " class in relation " . $relation . " does not exist");
+				}
+
+				$foreign_key_values = extract_values_of_key($main_result)
+
+				$result = $this->whereIn($foreign_key, $foreign_key_values, $table_name);
+
+				var_dump($result);
+				exit();
+			}
+			else
+			{
+				throw new Exception("Relation " . $relation . "does not exist for " . get_class($this) . "class");
+			}
+		}
+	}
+
 	public function sql_date_format(mixed $replace_at, array $data) : array
 	{
 		$data_mod = $data;
@@ -118,7 +168,7 @@ abstract class Model
 			{
 				if ((is_array($replace_at) && in_array($key_2, $replace_at)) || $key_2 == $replace_at)
 				{
-					$data_mod[$key_1][$key_2] = date("Y-m-d", strtotime($value_2));
+					$data_mod[$key_1][$key_2] = date($this->default_date_format, strtotime($value_2));
 				}
 			}
 		}
@@ -189,14 +239,30 @@ abstract class Model
 		if (func_num_args() < 3) $operator = "=";
 
 		if (trim($this->wheres) == "")
-			$this->wheres = "WHERE $column $operator ?";
+			$this->wheres = " WHERE ";
 		else
-			$this->wheres .= " AND $column $operator ? ";
+			$this->wheres .= " AND ";
+
+		$this->wheres .= "$column $operator ?";
 
 
 		$this->params[] = $value;
 
 		return $this;
+	}
+
+	public function whereIn(string $column, array $values, string $table = null) : object
+	{
+		if ($table == null) $table = $this->table;
+
+		if (trim($this->wheres) != "")
+			$this->wheres = " WHERE";
+		else
+			$this->wheres .= " AND" ;
+
+		$this->wheres .= "$table.$column IN (" . question_markify($values) . ")";
+
+		$this->params = array_merge($this->params, $values);
 	}
 
 	public function limit(int $num)
@@ -214,11 +280,29 @@ abstract class Model
 		return $this;
 	}
 
+	public function with($relations)
+	{
+		if (! is_array($relations)) $relations = [$relations];
+
+		$this->withs = $relations;
+
+		return $this;
+	}
+
 	public function get($reursive_coll = true)
 	{
+		if($this->query == "") $this->query = "SELECT * FROM  $this->table";
+
 		$result = $this->db->query_db("$this->query $this->wheres $this->limit;", $this->params);
 
+		if (!empty($this->withs))
+		{
+			$result = $this->compile_withs($result);
+		}
+
 		$this->clear();
+
+		return $result;
 		return collect($result, $reursive_coll);
 	}
 }

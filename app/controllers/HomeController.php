@@ -21,7 +21,12 @@ class HomeController extends Controller
 		// $result = $user_model->delete_by_id(1);
 
 		// $result = $user_model->get_by_name_age("Haris", 24);
-		$result = $user_model->get_by_name_like("Hari");
+		// $result = $user_model->get_by_name_like("Hari");
+
+		$result = $user_model->get_by_name_with_token("Haris");
+
+		var_dump($result);
+		exit();
 
 		return view("homepage", ["name" => $result->first()->name]);
 	}

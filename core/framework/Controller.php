@@ -8,7 +8,7 @@ class Controller
 	{
 		$security = new Security;
 
-//Generate security token if it does not exist 
+		//Generate security token if it does not exist 
 		$security->generate_csrf_token();
 
 		if (strtolower($_SERVER['REQUEST_METHOD']) == "post")
