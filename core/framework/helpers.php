@@ -8,6 +8,22 @@ function request()
 	return $coll->add($parser->get_query_params());
 }
 
+function dd()
+{
+	$args = func_get_args();
+	$caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0];
+
+	echo $caller['file'] . " : " . $caller['line'];
+
+	foreach ($args as $arg)
+	{
+		echo "<pre style='background-color: #1F1A24; color:#d5d5d5; padding: 15px'>";
+		var_dump($arg);
+		echo "</pre>";
+	}
+	exit();
+}
+
 function router()
 {
 	return new Core\Routing\Router();
@@ -32,20 +48,9 @@ function view_or_msg(string $view_name, string $msg = "")
 	}
 }
 
-function view(string $view_name, array $data = [])
+function view(string $name, array $data = [])
 {
-	$view_file = getcwd() . "/app/views/" . $view_name . ".php";
-
-	if (file_exists($view_file))
-	{
-		if (!empty($data)) extract($data);
-
-		require $view_file;
-	}
-	else
-	{
-		exit('View "' . $view_name . '" not found.');
-	}
+	return Core\Framework\View::compile_view($name, $data);
 }
 
 //Returns current datetime for sql
@@ -67,26 +72,24 @@ function csrf(bool $only_token = false) : string
 function collect($arr = [], bool $is_recursive = false)
 {
 	return new Core\Framework\Collection($arr, $is_recursive);
+}
 
-/**
- * Recursive collection example
+function extend($name)
+{
+	return Core\Framework\View::extend_layout($name);
+}
 
-	$x = collect([ "a" =>
-	[
-		"c" =>
-		[
-			"x" => "A",
-			"y" => "C"
-		],
-		"y" =>  "y",
-		"x" =>
-		[
-			"x" => "A",
-			"y" => "C"
-		],
-	],
-	"b" => "y" ], true);
+function section($name)
+{
+	return Core\Framework\View::start_section($name);
+}
 
-	var_dump($x->a->x->x);
- */
+function endsection()
+{
+	return Core\Framework\View::end_section();
+}
+
+function produce($name)
+{
+	return Core\Framework\View::yield_section($name);
 }

@@ -78,7 +78,25 @@ abstract class Model
 		return $return;
 	}
 
-	public function extract_values_of_key(string $needle, array $arr) : array
+/**
+ * Turns values into keys and keys into values
+ */
+	public function array_key_value_reverse(array $arr) : array
+	{
+		$new_arr = [];
+
+		foreach ($arr as $key => $value)
+		{
+			$new_arr[$value] = $key;
+		}
+
+		return $new_arr;
+	}
+
+/**
+ * Returns an array having values having specified needle (key)
+ */
+	public function extract_values_of_key(string $needle, array $arr, $preserve_keys = true) : array
 	{
 		$result = [];
 
@@ -90,7 +108,14 @@ abstract class Model
 			}
 			elseif($key === $needle)
 			{
-				$result[] = $value;
+				if ($preserve_keys)
+				{
+					$result[$key] = $value;
+				}
+				else
+				{
+					$result[] = $value;
+				}
 			}
 		}
 
@@ -149,48 +174,42 @@ abstract class Model
 				$foreign_key = end($relation_data);
 				$foreign_class = "\App\Models\\" . $relation_data[0];
 
-				if (class_exists($foreign_class))
-				{
-					$table_name = (new $foreign_class)->table;
-				}
-				else
+				if (!class_exists($foreign_class))
 				{
 					throw new Exception($relation_data[0] . " class in relation " . $relation . " does not exist");
 				}
 
+				//Create empty array with foreign key for results
+				foreach ($main_result as $key => $item)
+				{
+					$main_result[$key][$relation] = [];
+				}
+
 				$foreign_key_values = $this->extract_values_of_key($local_key, $main_result);
 
-				$result = $this->
+				$result = (new $foreign_class)->
 							select()			
-							->whereIn($foreign_key, $foreign_key_values);
+							->whereIn($foreign_key, $foreign_key_values)
+							->get(false)
+							->to_array();
 
-				$this->
+				$foreign_key_as_array_keys = $this->array_key_value_reverse($foreign_key_values);
 
-				var_dump($result);
-				exit();
+				foreach ($result as $key => $item)
+				{
+					$foreign_key_value = $item[$foreign_key];
+					$pos_in_arr = $foreign_key_as_array_keys[$foreign_key_value];
+					
+					$main_result[$pos_in_arr][$relation][] = $item;
+				}
+
+				return $main_result;
 			}
 			else
 			{
 				throw new Exception("Relation " . $relation . "does not exist for " . get_class($this) . "class");
 			}
 		}
-	}
-
-	public function sql_date_format(mixed $replace_at, array $data) : array
-	{
-		$data_mod = $data;
-
-		foreach ($data as $key_1 => $value_1)
-		{
-			foreach ($value_1 as $key_2 => $value_2)
-			{
-				if ((is_array($replace_at) && in_array($key_2, $replace_at)) || $key_2 == $replace_at)
-				{
-					$data_mod[$key_1][$key_2] = date($this->default_date_format, strtotime($value_2));
-				}
-			}
-		}
-		return $data_mod;
 	}
 
 	private function compile_select(array $selects = []) : string
@@ -221,7 +240,7 @@ abstract class Model
 
 	public function update(array $data)
 	{
-		if ($this->wheres == "") return false;
+		if ($this->wheres === "") return false;
 
 		$this->compile_update($data);
 		$result = $this->db->manipulate_db("$this->query $this->wheres $this->limit;", $this->params);
@@ -232,7 +251,7 @@ abstract class Model
 
 	public function delete() : bool
 	{
-		if ($this->wheres == "") return false;
+		if ($this->wheres === "") return false;
 
 		$result = $this->db->manipulate_db("DELETE FROM $this->table $this->wheres $this->limit;", $this->params);
 
@@ -249,14 +268,14 @@ abstract class Model
 
 	public function where(string $column, string $operator = "=", string $value = null) : object
 	{
-		if (func_num_args() == 1)
+		if (func_num_args() === 1)
 			$value = "NULL";
-		elseif (func_num_args() == 2)
+		elseif (func_num_args() === 2)
 			$value = $operator;
 
 		if (func_num_args() < 3) $operator = "=";
 
-		if (trim($this->wheres) == "")
+		if (trim($this->wheres) === "")
 			$this->wheres = " WHERE ";
 		else
 			$this->wheres .= " AND ";
@@ -271,7 +290,7 @@ abstract class Model
 
 	public function whereIn(string $column, array $values) : object
 	{
-		if (trim($this->wheres) != "")
+		if (trim($this->wheres) === "")
 			$this->wheres = " WHERE";
 		else
 			$this->wheres .= " AND" ;
@@ -307,20 +326,19 @@ abstract class Model
 		return $this;
 	}
 
-	public function get($reursive_coll = true)
+	public function get(bool $reursive_coll = true)
 	{
-		if($this->query == "") $this->query = "SELECT * FROM  $this->table";
+		if($this->query === "") $this->query = "SELECT * FROM  $this->table";
 
 		$result = $this->db->query_db("$this->query $this->wheres $this->limit;", $this->params);
 
-		if (!empty($this->withs))
+		if (!empty($result) && !empty($this->withs))
 		{
 			$result = $this->compile_withs($result);
 		}
 
 		$this->clear();
 
-		return $result;
 		return collect($result, $reursive_coll);
 	}
 }

@@ -9,7 +9,7 @@ class HomeController extends Controller
 {
 	public function index()
 	{
-		return view("homepage", ["name" => "Human"]);
+		return view("index", ["name" => "Human"]);
 	}
 
 	public function orm_demo()
@@ -25,10 +25,7 @@ class HomeController extends Controller
 
 		$result = $user_model->get_by_name_with_token("Haris");
 
-		var_dump($result);
-		exit();
-
-		return view("homepage", ["name" => $result->first()->name]);
+		return view("index", ["user" => $result->first()]);
 	}
 
 	public function regex_route()
