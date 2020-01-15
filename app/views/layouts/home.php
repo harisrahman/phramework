@@ -4,13 +4,20 @@
 	<title></title>
 </head>
 <body>
-	<h1>Home</h1>
-	<div class="main">
+	<nav>
+		<ul>
+			<li>Home</li>
+			<li>About</li>
+			<li>Contact</li>
+		</ul>
+	</nav>
+	
+	<div>
 		<?php produce("main") ?>
 	</div>
 
 	<footer>
-		<?php produce("footer") ?>
+		© Haris Rahman	
 	</footer>
 </body>
 </html>

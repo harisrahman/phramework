@@ -4,11 +4,4 @@
 
 <?php endsection() ?>
 
-<?php section("footer") ?>
-
-	<p>footer</p>
-
-<?php endsection() ?>
-
-
 <?php extend("home") ?>
