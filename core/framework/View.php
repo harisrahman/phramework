@@ -50,6 +50,13 @@ class View
 			require $view_file;
 
 			self::$view_file = $view_file;
+
+			if (array_key_exists('with_data', $_SESSION) && is_array($_SESSION['with_data']))
+			{
+				extract($_SESSION['with_data']);
+				unset($_SESSION['with_data']);
+			}
+
 			self::yield_view();
 		}
 		else

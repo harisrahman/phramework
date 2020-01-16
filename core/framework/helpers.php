@@ -29,6 +29,11 @@ function router()
 	return new Core\Routing\Router();
 }
 
+function route()
+{
+	return Core\Routing\Route::run();
+}
+
 function view_exists(string $view_name)
 {
 	$view_file = getcwd() . "/app/views/" . $view_name . ".php";
@@ -104,8 +109,18 @@ function asset($url)
 	return url() . "/public/" . $url;
 }
 
-function redirect($url, $statusCode = 303)
+function redirect($url, $data = null, $statusCode = 303)
 {
+	if ($url[0] !== "/") $url =  "/" . $url;
+
+	$_SESSION['with_data'] = $data;
+
 	header('Location: ' . url($url), true, $statusCode);
 	die();
+}
+
+function middleware($name)
+{
+	$class = "App\Controllers\Middlewares\\" . $name;
+	return new $class;
 }

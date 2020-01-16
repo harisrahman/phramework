@@ -14,7 +14,7 @@ class Router
 	function __construct()
 	{
 		require(__DIR__. '/../../routes/web.php');
-		$this->routes = $this->remove_first_slashes($routes);
+		$this->routes = $this->remove_first_slashes(Route::$routes);
 	}
 
 	private function remove_first_slashes(array $routes) : array
@@ -62,12 +62,12 @@ class Router
 
 		if (!is_array($this->routes[$this->uri]))
 		{
-			$this->route_string = $this->routes[$this->uri];
+			$this->route_string = $this->routes[$this->uri]["callback"];
 			return true;
 		}
 		elseif (array_key_exists($this->method, $this->routes[$this->uri]))
 		{
-			$this->route_string = $this->routes[$this->uri][$this->method];
+			$this->route_string = $this->routes[$this->uri][$this->method]["callback"];
 			return true;
 		}
 
@@ -116,10 +116,33 @@ class Router
 		return false;
 	}
 
+	private function run_middlewares()
+	{
+		if (array_key_exists("middleware", $this->routes[$this->uri]))
+		{
+			$middleware = $this->routes[$this->uri]["middleware"];
+		}
+		elseif (array_key_exists("middleware", $this->routes[$this->uri][$this->method]))
+		{
+			$middleware = $this->routes[$this->uri][$this->method]["middleware"];
+		}
+
+		if (isset($middleware))
+		{
+			$middleware = is_array($middleware) ? $middleware : [$middleware];
+
+			foreach ($middleware as $ware)
+			{
+				middleware($ware);
+			}
+		}
+	}
+
 	public function run()
 	{
 		if ($this->get_matching_route() !== false)
 		{
+			$this->run_middlewares();
 			return $this->set_controller_and_action();
 		}
 		//Return 404

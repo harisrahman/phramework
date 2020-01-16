@@ -26,7 +26,7 @@ class UrlParser
 		$url_string = implode("/", $url_arr);
 		$host_url = sprintf("%s://%s", isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', $_SERVER['SERVER_NAME']);
 
-		return $host_url . "/" . $url_string . "/";
+		return $host_url . $url_string;
 	}
 
 	public function parse_url($url)
@@ -72,5 +72,4 @@ class UrlParser
 
 		return $params_arr;
 	}
-
 }
