@@ -2,6 +2,8 @@
 
 namespace Core\Framework;
 
+use Exception;
+
 class View
 {
 	public static $layout = "";

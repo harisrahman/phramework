@@ -36,7 +36,7 @@ function view_exists(string $view_name)
 	return file_exists($view_file);
 }
 
-function view_or_msg(string $view_name, string $msg = "")
+function view_or_exception(string $view_name, string $msg = "")
 {
 	if (view_exists($view_name))
 	{
@@ -44,7 +44,7 @@ function view_or_msg(string $view_name, string $msg = "")
 	}
 	else
 	{
-		exit($msg);
+		throw new Exception($msg);
 	}
 }
 
@@ -92,4 +92,20 @@ function endsection()
 function produce($name)
 {
 	return Core\Framework\View::yield_section($name);
+}
+
+function url($path = "")
+{
+	return (new Core\Routing\UrlParser())->base_url() . $path;
+}
+
+function asset($url)
+{
+	return url() . "/public/" . $url;
+}
+
+function redirect($url, $statusCode = 303)
+{
+	header('Location: ' . url($url), true, $statusCode);
+	die();
 }

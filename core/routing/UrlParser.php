@@ -17,6 +17,18 @@ class UrlParser
 		return $url_string;
 	}
 
+	public function base_url()
+	{
+		$exec_script = explode("/", $_SERVER["PHP_SELF"]);
+
+		//Count - 1 because at last is the .php file name
+		$url_arr = array_splice($exec_script, 0, count($exec_script) - 1);
+		$url_string = implode("/", $url_arr);
+		$host_url = sprintf("%s://%s", isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', $_SERVER['SERVER_NAME']);
+
+		return $host_url . "/" . $url_string . "/";
+	}
+
 	public function parse_url($url)
 	{
 		$url = urldecode(parse_url($url, PHP_URL_PATH));
