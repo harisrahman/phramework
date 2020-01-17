@@ -125,9 +125,3 @@ function middleware(string $name)
 	$class = "App\Controllers\Middlewares\\" . $name;
 	return new $class;
 }
-
-function ee($value)
-{
-	dd(${$value});
-	return isset(${$value}) ? ${$value} : "";
-}
