@@ -46,16 +46,23 @@ class View
 		if (file_exists($view_file))
 		{
 			if (!empty($data)) extract($data);
-
-			require $view_file;
-
-			self::$view_file = $view_file;
-
 			if (array_key_exists('with_data', $_SESSION) && is_array($_SESSION['with_data']))
 			{
 				extract($_SESSION['with_data']);
 				unset($_SESSION['with_data']);
 			}
+
+			$old = collect();
+
+			if (array_key_exists('old_data', $_SESSION) && is_array($_SESSION['old_data']))
+			{
+				$old = collect($_SESSION['old_data']);
+				unset($_SESSION['old_data']);	
+			}
+
+			require $view_file;
+
+			self::$view_file = $view_file;
 
 			self::yield_view();
 		}

@@ -15,7 +15,7 @@ class Controller
 		{
 			if ($security->verify_csrf_token() === false)
 			{
-				return $this->error_419("This page has expired");
+				return $this->error_419("419 - This page has expired");
 			}
 		}
 	}

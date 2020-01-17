@@ -94,33 +94,40 @@ function endsection()
 	return Core\Framework\View::end_section();
 }
 
-function produce($name)
+function produce(string $name)
 {
 	return Core\Framework\View::yield_section($name);
 }
 
-function url($path = "")
+function url(string $path = "")
 {
 	return (new Core\Routing\UrlParser())->base_url() . $path;
 }
 
-function asset($url)
+function asset(string $url)
 {
 	return url() . "/public/" . $url;
 }
 
-function redirect($url, $data = null, $statusCode = 303)
+function redirect(string $url, array $data = [],  array $old = [], int $statusCode = 303)
 {
 	if ($url[0] !== "/") $url =  "/" . $url;
 
 	$_SESSION['with_data'] = $data;
+	$_SESSION['old_data'] = $old;
 
 	header('Location: ' . url($url), true, $statusCode);
 	die();
 }
 
-function middleware($name)
+function middleware(string $name)
 {
 	$class = "App\Controllers\Middlewares\\" . $name;
 	return new $class;
+}
+
+function ee($value)
+{
+	dd(${$value});
+	return isset(${$value}) ? ${$value} : "";
 }
