@@ -4,7 +4,7 @@ namespace Core\Framework;
 
 class Database
 {
-	private $conn;
+	private static $conn;
 
 /**
  * Connection to DB
@@ -19,7 +19,7 @@ class Database
 				\PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION, //turn on errors in the form of exceptions
 				\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, //make the default fetch be an associative array
 			];
-		 	$this->conn = new \PDO($dsn, getenv("DB_USERNAME"), getenv("DB_PASSWORD"), $options);
+		 	self::$conn = new \PDO($dsn, getenv("DB_USERNAME"), getenv("DB_PASSWORD"), $options);
 		}
 		catch(\PDOException $e)
 		{
@@ -32,7 +32,7 @@ class Database
  */
 	public function manipulate_db(string $query, array $parameters = []) : bool
 	{
-		$stmt = $this->conn->prepare($query);
+		$stmt = self::$conn->prepare($query);
 		$stmt->execute($parameters);
 		$result = $stmt->rowCount();
 		$stmt = null;
@@ -42,7 +42,7 @@ class Database
 
 	public function get_last_id()
 	{
-		return $this->conn->lastInsertId();
+		return self::$conn->lastInsertId();
 	}
 
 /**
@@ -50,7 +50,7 @@ class Database
  */
 	public function query_db($query, array $parameters = []) : array
 	{
-		$stmt = $this->conn->prepare($query);
+		$stmt = self::$conn->prepare($query);
 		$stmt->execute($parameters);
 		$result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		$stmt = null;
